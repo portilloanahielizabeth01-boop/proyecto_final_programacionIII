@@ -4,12 +4,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Cliente extends Model
+class Contacto extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'persona_id','fecha_ingreso'
+        'persona_id',
+        'tipo_contacto_id',
+        'valor'
     ];
 
     public function persona()
@@ -17,8 +19,8 @@ class Cliente extends Model
         return $this->belongsTo(Persona::class);
     }
 
-    public function reparaciones()
+    public function tipoContacto()
     {
-        return $this->hasMany(ClienteReparacion::class);
+        return $this->belongsTo(TipoContacto::class);
     }
 }

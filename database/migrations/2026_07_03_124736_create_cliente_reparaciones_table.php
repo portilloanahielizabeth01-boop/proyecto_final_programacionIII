@@ -1,0 +1,41 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('cliente_reparaciones', function (Blueprint $table) {
+            $table->id();
+
+            $table->foreignId('cliente_id')->constrained('clientes');
+            $table->foreignId('empleado_id')->constrained('empleados');
+            $table->foreignId('celular_id')->constrained('celulares');
+            $table->foreignId('reparacion_id')->constrained('reparaciones');
+            $table->foreignId('stock_id')->nullable()->constrained('stocks');
+
+            $table->text('descripcion')->nullable();
+            $table->date('fecha_ingreso');
+            $table->date('fecha_egreso')->nullable();
+
+            $table->decimal('precio_final', 10, 2)->nullable();
+            $table->string('estado'); // pendiente, proceso, terminado
+
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('cliente_reparaciones');
+    }
+};

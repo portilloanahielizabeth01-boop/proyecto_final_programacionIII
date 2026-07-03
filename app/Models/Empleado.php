@@ -4,12 +4,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Cliente extends Model
+class Empleado extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'persona_id','fecha_ingreso'
+        'persona_id','codigo'
     ];
 
     public function persona()

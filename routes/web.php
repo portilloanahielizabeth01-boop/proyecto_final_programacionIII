@@ -3,13 +3,26 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ClienteController;
 
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+*/
+
+// Página principal → redirige a clientes
 Route::get('/', function () {
-    return view('welcome');
+    return redirect('/clientes');
 });
 
-Route::get('/clientes', [ClienteController::class, 'index']);
-Route::get('/clientes/create', [ClienteController::class, 'create']);
-Route::post('/clientes', [ClienteController::class, 'store']);
-Route::get('/clientes/{id}/edit', [ClienteController::class, 'edit']);
-Route::put('/clientes/{id}', [ClienteController::class, 'update']);
-Route::delete('/clientes/{id}', [ClienteController::class, 'destroy']);
+// CRUD de clientes (agrupado y ordenado)
+Route::prefix('clientes')->group(function () {
+
+    Route::get('/', [ClienteController::class, 'index']);          // Listar
+    Route::get('/create', [ClienteController::class, 'create']);    // Form crear
+    Route::post('/', [ClienteController::class, 'store']);          // Guardar
+
+    Route::get('/{id}/edit', [ClienteController::class, 'edit']);   // Form editar
+    Route::put('/{id}', [ClienteController::class, 'update']);      // Actualizar
+
+    Route::delete('/{id}', [ClienteController::class, 'destroy']);  // Eliminar
+});

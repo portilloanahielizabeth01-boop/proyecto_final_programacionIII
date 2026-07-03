@@ -4,18 +4,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Cliente extends Model
+class Celular extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'persona_id','fecha_ingreso'
+        'nombre','modelo','anio'
     ];
-
-    public function persona()
-    {
-        return $this->belongsTo(Persona::class);
-    }
 
     public function reparaciones()
     {

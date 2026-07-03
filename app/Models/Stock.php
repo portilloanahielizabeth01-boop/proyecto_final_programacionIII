@@ -4,20 +4,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Cliente extends Model
+class Stock extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'persona_id','fecha_ingreso'
+        'nombre','descripcion','cantidad',
+        'precio_comprado','precio_venta'
     ];
 
-    public function persona()
-    {
-        return $this->belongsTo(Persona::class);
-    }
-
-    public function reparaciones()
+    public function clienteReparaciones()
     {
         return $this->hasMany(ClienteReparacion::class);
     }
