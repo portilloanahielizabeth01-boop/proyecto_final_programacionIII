@@ -33,3 +33,8 @@ use App\Http\Controllers\AuthController;
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+use App\Http\Controllers\RegistroController;
+
+// Rutas exclusivas para el registro de Anahí
+Route::get('/registro-tecnico', [RegistroController::class, 'mostrarFormulario'])->name('tecnico.registro.ver');
+Route::post('/registro-tecnico', [RegistroController::class, 'registrar'])->name('tecnico.registro.guardar');
