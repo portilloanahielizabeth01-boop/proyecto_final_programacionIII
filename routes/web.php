@@ -26,3 +26,10 @@ Route::prefix('clientes')->group(function () {
 
     Route::delete('/{id}', [ClienteController::class, 'destroy']);  // Eliminar
 });
+
+use App\Http\Controllers\AuthController;
+
+// Rutas de Autenticación
+Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+Route::post('/login', [AuthController::class, 'login']);
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
