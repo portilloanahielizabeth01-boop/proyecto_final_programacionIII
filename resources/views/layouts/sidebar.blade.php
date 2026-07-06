@@ -34,7 +34,7 @@
 
         <!-- Otros Módulos -->
         <li class="menu-item">
-            <a href="#" class="menu-link">
+            <a href="{{ route('personal.index') }}" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-hard-hat"></i>
                 <div>Empleados</div>
             </a>

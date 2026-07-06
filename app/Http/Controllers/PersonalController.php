@@ -7,14 +7,29 @@ use App\Models\Personal;
 
 class PersonalController extends Controller
 {
-    // Muestra el formulario y la lista de personal todo junto
-    public function index()
+    // Muestra el formulario y la lista de personal, ahora con soporte para búsqueda
+    public function index(Request $request)
     {
-        $personalMuestra = Personal::all(); // Trae a todos los empleados de la BD
+        // 1. Capturamos lo que el usuario escribió en el input "buscar"
+        $buscar = $request->input('buscar');
+
+        // 2. Iniciamos la consulta base
+        $query = Personal::query();
+
+        // 3. Si hay algo en la variable $buscar, agregamos las condiciones
+        if ($buscar) {
+            $query->where('nombre', 'LIKE', '%' . $buscar . '%')
+                  ->orWhere('apellido', 'LIKE', '%' . $buscar . '%')
+                  ->orWhere('codigo_unico', 'LIKE', '%' . $buscar . '%');
+        }
+
+        // 4. Ejecutamos la consulta para traer los datos (filtrados o todos)
+        $personalMuestra = $query->get(); 
+
         return view('personal.index', compact('personalMuestra'));
     }
 
-    // Guarda el nuevo personal en la base de datos
+    // Guarda el nuevo personal en la base de datos (Sin cambios)
     public function store(Request $request)
     {
         $request->validate([
