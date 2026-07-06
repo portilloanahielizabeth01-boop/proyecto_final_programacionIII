@@ -20,7 +20,8 @@ class Usuario extends Authenticatable
     protected $fillable = [
         'persona_id',
         'usuario',
-        'password'
+        'password',
+        'rol'
     ];
 
     public function persona()

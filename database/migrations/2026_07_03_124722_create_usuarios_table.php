@@ -6,24 +6,24 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
-    public function up(): void
+    public function up()
     {
         Schema::create('usuarios', function (Blueprint $table) {
             $table->id();
+            
+            // Tus otras columnas
             $table->foreignId('persona_id')->constrained('personas');
-            $table->string('usuario')->unique();
+            $table->string('usuario');
             $table->string('password');
+            
+            // ¡ESTA ES LA COLUMNA QUE FALTA EN TU BD!
+            $table->string('rol')->default('empleado'); 
+            
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
+    public function down()
     {
         Schema::dropIfExists('usuarios');
     }
