@@ -16,21 +16,25 @@ class AuthController extends Controller
     // Procesar el intento de ingreso
     public function login(Request $request)
     {
-        // Validamos que completen los campos
+        // 1. Validamos los campos del formulario (el input se llama 'email')
         $credentials = $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required'],
         ]);
 
-        // Intentamos iniciar sesión
-        if (Auth::attempt($credentials)) {
+        // 2. Intentamos iniciar sesión mapeando a tu base de datos
+        // Aquí usamos 'usuario' (en singular) que es el nombre exacto de tu columna
+        if (Auth::attempt([
+            'usuario' => $credentials['email'], 
+            'password' => $credentials['password']
+        ])) {
             $request->session()->regenerate();
 
-            // Si entra bien, lo mandamos a la lista de clientes
-            return redirect()->intended('clientes');
+            
+            return redirect()->intended('dashboard');
         }
 
-        // Si se equivoca, lo mandamos atrás con un error
+        // 3. Si falla
         return back()->withErrors([
             'email' => 'Las credenciales no coinciden con nuestros registros.',
         ])->onlyInput('email');

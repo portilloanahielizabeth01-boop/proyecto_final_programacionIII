@@ -1,157 +1,184 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registro de Técnicos</title>
-    <style>
-        body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            background-color: #f4f6f9; 
-            padding: 40px 15px; 
-            margin: 0;
-        }
-        .form-container { 
-            max-width: 450px; 
-            margin: 0 auto; 
-            background: white; 
-            padding: 30px; 
-            border-radius: 10px; 
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1); 
-        }
-        h2 {
-            margin-top: 0;
-            color: #333;
-            text-align: center;
-            margin-bottom: 25px;
-        }
-        .form-group { 
-            margin-bottom: 20px; 
-        }
-        label { 
-            display: block; 
-            margin-bottom: 8px; 
-            font-weight: 600; 
-            color: #495057;
-        }
-        input, select { 
-            width: 100%; 
-            padding: 10px; 
-            box-sizing: border-box; 
-            border: 1px solid #ced4da; 
-            border-radius: 5px; 
-            font-size: 14px;
-            transition: border-color 0.2s;
-        }
-        input:focus, select:focus {
-            outline: none;
-            border-color: #28a745;
-        }
-        button { 
-            width: 100%; 
-            padding: 12px; 
-            background-color: #28a745; 
-            color: white; 
-            border: none; 
-            border-radius: 5px; 
-            font-size: 16px; 
-            font-weight: bold;
-            cursor: pointer; 
-            margin-top: 10px;
-            transition: background-color 0.2s;
-        }
-        button:hover {
-            background-color: #218838;
-        }
-        .error-box { 
-            background-color: #f8d7da;
-            color: #721c24; 
-            padding: 12px;
-            border-radius: 5px;
-            font-size: 14px; 
-            margin-bottom: 20px; 
-            border: 1px solid #f5c6cb;
-        }
-        .text-muted {
-            font-size: 12px;
-            color: #6c757d;
-            margin-top: 4px;
-        }
-    </style>
-</head>
-<body>
+@extends('layouts.auth')
 
-<div class="form-container">
-    <h2>Registro de Nuevo Técnico</h2>
+@section('content')
 
-    @if(session('error'))
-        <div class="error-box">
-            {{ session('error') }}
+<div class="container-xxl">
+    <div class="authentication-wrapper authentication-basic container-p-y">
+        <div class="authentication-inner">
+
+            <div class="card">
+                <div class="card-body">
+
+                    <!-- Logo -->
+                    <div class="app-brand justify-content-center mb-3">
+                        <a href="#" class="app-brand-link gap-2">
+                            <span class="app-brand-text demo text-body fw-bolder">Sneat</span>
+                        </a>
+                    </div>
+
+                    <h4 class="mb-2 text-center">Registro de Técnico 🚀</h4>
+                    <p class="mb-4 text-center">Crea tu cuenta para acceder al sistema</p>
+
+                    {{-- ERROR GENERAL --}}
+                    @if(session('error'))
+                    <div class="alert alert-danger">
+                        {{ session('error') }}
+                    </div>
+                    @endif
+
+                    <form action="{{ route('tecnico.registro.guardar') }}" method="POST">
+                        @csrf
+
+                        <!-- NOMBRE -->
+                        <div class="mb-3">
+                            <label class="form-label">Nombre</label>
+                            <input type="text"
+                                name="nombre"
+                                value="{{ old('nombre') }}"
+                                class="form-control @error('nombre') is-invalid @enderror"
+                                required>
+
+                            @error('nombre')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <!-- APELLIDO -->
+                        <div class="mb-3">
+                            <label class="form-label">Apellido</label>
+                            <input type="text"
+                                name="apellido"
+                                value="{{ old('apellido') }}"
+                                class="form-control @error('apellido') is-invalid @enderror"
+                                required>
+
+                            @error('apellido')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <!-- DNI -->
+                        <div class="mb-3">
+                            <label class="form-label">DNI</label>
+                            <input type="text"
+                                name="dni"
+                                value="{{ old('dni') }}"
+                                class="form-control @error('dni') is-invalid @enderror"
+                                required>
+
+                            @error('dni')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+
+
+                        <!-- FECHA NACIMIENTO -->
+                        <div class="mb-3">
+                            <label class="form-label">Fecha nacimiento</label>
+
+                            <input type="date"
+                                name="fecha_nacimiento"
+                                value="{{ old('fecha_nacimiento') }}"
+                                class="form-control @error('fecha_nacimiento') is-invalid @enderror"
+                                required>
+
+                            @error('fecha_nacimiento')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <!-- SEXO -->
+                        <div class="mb-3">
+                            <label class="form-label">Sexo</label>
+
+                            <select name="sexo"
+                                class="form-select @error('sexo') is-invalid @enderror"
+                                required>
+
+                                <option value="">Seleccione...</option>
+                                <option value="Masculino" {{ old('sexo')=='Masculino'?'selected':'' }}>Masculino</option>
+                                <option value="Femenino" {{ old('sexo')=='Femenino'?'selected':'' }}>Femenino</option>
+                                <option value="Otro" {{ old('sexo')=='Otro'?'selected':'' }}>Otro</option>
+                            </select>
+
+                            @error('sexo')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <!-- CÓDIGO TÉCNICO -->
+                        <div class="mb-3">
+                            <label class="form-label">Código técnico</label>
+
+                            <input type="text"
+                                name="codigo"
+                                class="form-control @error('codigo') is-invalid @enderror"
+                                required>
+
+                            <small class="text-muted">Solicítalo al administrador</small>
+
+                            @error('codigo')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <hr>
+                        <!-- USUARIO (EMAIL) -->
+                        <div class="mb-3">
+                            <label class="form-label">usuario</label>
+
+                            <input type="text"
+                                name="usuario"
+                                value="{{ old('usuario') }}"
+                                placeholder="ejemplo@mail.com"
+                                class="form-control @error('usuario') is-invalid @enderror"
+                                required>
+
+                            @error('usuario')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <!-- PASSWORD -->
+                        <div class="mb-3 form-password-toggle">
+                            <label class="form-label">Contraseña</label>
+
+                            <div class="input-group input-group-merge">
+                                <input type="password"
+                                    name="password"
+                                    class="form-control @error('password') is-invalid @enderror"
+                                    required>
+
+                                <span class="input-group-text cursor-pointer">
+                                    <i class="bx bx-hide"></i>
+                                </span>
+                            </div>
+
+                            @error('password')
+                            <div class="invalid-feedback d-block">
+                                {{ $message }}
+                            </div>
+                            @enderror
+                        </div>
+
+                        <!-- BOTÓN SUBMIT -->
+                        <button type="submit" class="btn btn-primary d-grid w-100">
+                            Crear cuenta
+                        </button>
+
+                    </form>
+
+                    <!-- VOLVER AL LOGIN -->
+                    <a href="{{ url('/login') }}"
+                        class="btn btn-outline-secondary d-grid w-100 mt-2">
+                        ← Volver al inicio
+                    </a>
+
+                </div>
+            </div>
+
         </div>
-    @endif
-
-    @if($errors->any())
-        <div class="error-box">
-            <ul style="margin: 0; padding-left: 20px;">
-                @foreach($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
-
-    <form action="{{ route('tecnico.registro.guardar') }}" method="POST">
-        @csrf <div class="form-group">
-            <label>Nombre:</label>
-            <input type="text" name="nombre" value="{{ old('nombre') }}" placeholder="Ej: Juan" required>
-        </div>
-
-        <div class="form-group">
-            <label>Apellido:</label>
-            <input type="text" name="apellido" value="{{ old('apellido') }}" placeholder="Ej: Pérez" required>
-        </div>
-
-        <div class="form-group">
-            <label>DNI / Documento:</label>
-            <input type="text" name="dni" value="{{ old('dni') }}" placeholder="Ej: 45678912" required>
-        </div>
-
-        <div class="form-group">
-            <label>Fecha de Nacimiento:</label>
-            <input type="date" name="fecha_nacimiento" value="{{ old('fecha_nacimiento') }}" required>
-        </div>
-
-        <div class="form-group">
-            <label>Sexo:</label>
-            <select name="sexo" required>
-                <option value="">Seleccione...</option>
-                <option value="Masculino" {{ old('sexo') == 'Masculino' ? 'selected' : '' }}>Masculino</option>
-                <option value="Femenino" {{ old('sexo') == 'Femenino' ? 'selected' : '' }}>Femenino</option>
-                <option value="Otro" {{ old('sexo') == 'Otro' ? 'selected' : '' }}>Otro</option>
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label>Código de Técnico Autorizado:</label>
-            <input type="text" name="codigo" placeholder="Ej: TEC-2026" required>
-            <div class="text-muted">Solicita este código al administrador del sistema.</div>
-        </div>
-
-        <hr style="border: 0; border-top: 1px solid #eee; margin: 25px 0;">
-
-        <div class="form-group">
-            <label>Nombre de Usuario:</label>
-            <input type="text" name="usuario" value="{{ old('usuario') }}" placeholder="Ej: juan.tecnico" required>
-        </div>
-
-        <div class="form-group">
-            <label>Contraseña:</label>
-            <input type="password" name="contraseña" placeholder="Mínimo 6 caracteres" required>
-        </div>
-
-        <button type="submit">Crear Cuenta de Técnico</button>
-    </form>
+    </div>
 </div>
 
-</body>
-</html>
+@endsection
