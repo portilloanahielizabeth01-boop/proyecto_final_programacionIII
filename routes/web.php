@@ -62,3 +62,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/stock', [StockController::class, 'index'])
         ->name('stock.index');
 });
+use App\Http\Controllers\PersonalController;
+
+Route::get('/carga-personal', [PersonalController::class, 'index'])->name('personal.index');
+Route::post('/carga-personal', [PersonalController::class, 'store'])->name('personal.store');
