@@ -1,20 +1,19 @@
 <?php
 
 namespace App\Models;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+
 use Illuminate\Database\Eloquent\Model;
 
 class Stock extends Model
 {
-    use HasFactory;
+    protected $table = 'stocks'; 
 
-    protected $fillable = [
-        'nombre','descripcion','cantidad',
-        'precio_comprado','precio_venta'
-    ];
+    protected $fillable = ['nombre'];
 
-    public function clienteReparaciones()
+    public function celularesCompatibles()
     {
-        return $this->hasMany(ClienteReparacion::class);
+        return $this->belongsToMany(Celular::class, 'celular_stock', 'stock_id', 'celular_id')
+                    ->withPivot('cantidad', 'precio_comprado', 'precio_venta', 'descripcion')
+                    ->withTimestamps();
     }
 }

@@ -5,8 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Usuario;
 use App\Models\Persona;
-use App\Models\Empleado; // Agregado
-use App\Models\Contacto; // Agregado
+use App\Models\Empleado;
+use App\Models\Contacto;
+use App\Models\Personal;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 
@@ -19,24 +20,15 @@ class RegistroController extends Controller
 
     public function registrar(Request $request)
     {
-        // 📅 fecha límite (120 años)
         $fechaMinima = now()->subYears(120)->toDateString();
 
         $request->validate([
             'nombre' => 'required|string|max:50',
             'apellido' => 'required|string|max:50',
-
-            // 📅 edad lógica (0 - 120 años)
             'fecha_nacimiento' => "required|date|before:today|after:$fechaMinima",
-
-            // 📧 usuario como email real (Verifica que no exista en usuarios ni en contactos)
             'usuario' => 'required|email|max:100|unique:usuarios,usuario|unique:contactos,valor',
-
-            // 🔐 Contraseña con confirmación (Requiere un campo password_confirmation en la vista)
             'password' => 'required|string|min:6|max:100|confirmed',
-
-            // 🧑‍🔧 Código de empleado (Verifica que no exista en la tabla empleados)
-            'codigo' => 'required|string|unique:empleados,codigo',
+            'codigo' => 'required|string',
         ], [
             'nombre.required' => 'El nombre es obligatorio',
             'apellido.required' => 'El apellido es obligatorio',
@@ -51,53 +43,86 @@ class RegistroController extends Controller
 
             'password.required' => 'La contraseña es obligatoria',
             'password.min' => 'La contraseña debe tener al menos 6 caracteres',
-            'password.confirmed' => 'Las contraseñas no coinciden', // Mensaje nuevo
+            'password.confirmed' => 'Las contraseñas no coinciden',
 
             'codigo.required' => 'El código de técnico es obligatorio',
-            'codigo.unique' => 'Este código ya está en uso', // Mensaje nuevo
         ]);
 
+        // Buscar el empleado autorizado por el administrador
+        $personal = Personal::where('codigo_unico', $request->codigo)->first();
+
+        if (!$personal) {
+            return back()
+                ->withInput()
+                ->withErrors([
+                    'codigo' => 'El código ingresado no fue autorizado por el administrador.'
+                ]);
+        }
+
+        // Verificar que el nombre y apellido coincidan
+        if (
+            strtolower(trim($personal->nombre)) !== strtolower(trim($request->nombre)) ||
+            strtolower(trim($personal->apellido)) !== strtolower(trim($request->apellido))
+        ) {
+            return back()
+                ->withInput()
+                ->withErrors([
+                    'nombre' => 'El nombre, apellido y código no coinciden con los datos registrados por el administrador.'
+                ]);
+        }
+
+        // Verificar que el empleado no se haya registrado antes
+        if (Empleado::where('codigo', $request->codigo)->exists()) {
+            return back()
+                ->withInput()
+                ->withErrors([
+                    'codigo' => 'Este empleado ya completó su registro.'
+                ]);
+        }
+
         try {
+
             DB::transaction(function () use ($request) {
 
-                // 1. Crear Persona (Sin DNI ni Sexo)
+                // Crear Persona
                 $persona = Persona::create([
                     'nombre' => $request->nombre,
                     'apellido' => $request->apellido,
                     'fecha_nacimiento' => $request->fecha_nacimiento,
                 ]);
 
-                // 2. Crear Empleado usando el ID de la persona
+                // Crear Empleado
                 Empleado::create([
                     'persona_id' => $persona->id,
                     'codigo' => $request->codigo,
                 ]);
 
-                // 3. Crear Contacto (Correo) usando el ID de la persona
+                // Crear Contacto
                 Contacto::create([
                     'persona_id' => $persona->id,
-                    'tipo_contacto_id' => 1, // Asegúrate de que 1 sea el ID para "Email" en tu BD
+                    'tipo_contacto_id' => 1,
                     'valor' => $request->usuario,
                 ]);
 
-                // 4. Crear Usuario
+                // Crear Usuario
                 Usuario::create([
                     'persona_id' => $persona->id,
-                    'usuario' => $request->usuario, // email
+                    'usuario' => $request->usuario,
                     'password' => Hash::make($request->password),
-                    'rol' => 'empleado', // Por si lo necesitas definir por defecto
+                    'rol' => 'empleado',
                 ]);
             });
 
             return redirect('/login')
-                ->with('success', 'Registro exitoso. Ya puedes iniciar sesión');
+                ->with('success', 'Registro exitoso. Ya puedes iniciar sesión.');
 
         } catch (\Exception $e) {
+
             return back()
-                ->withInput()
-                ->with('error', 'Error al registrar el usuario. Intente nuevamente.');
-                
-            // 🔥 DESARROLLO (opcional para ver el error exacto si algo falla):
+    ->withInput()
+    ->with('error', $e->getMessage());
+
+            // Para depuración:
             // ->with('error', $e->getMessage());
         }
     }

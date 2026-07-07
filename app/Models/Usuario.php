@@ -3,20 +3,20 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-// 1. Quitamos 'Model' y agregamos 'Authenticatable'
+// Heredamos de Authenticatable en lugar del Model común de Eloquent
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use App\Models\Persona;
 
-// 2. Cambiamos 'extends Model' por 'extends Authenticatable'
 class Usuario extends Authenticatable 
 {
     use HasFactory;
 
-    // 3. (Opcional pero recomendado) Escondemos el password para que no viaje en consultas
-    protected $hidden = [
-        'password',
-    ];
+    // Nombre de tu tabla personalizada si Laravel no la deduce automáticamente
+    protected $table = 'usuarios';
 
+    /**
+     * Los atributos que se pueden asignar de forma masiva.
+     */
     protected $fillable = [
         'persona_id',
         'usuario',
@@ -24,8 +24,19 @@ class Usuario extends Authenticatable
         'rol'
     ];
 
+    /**
+     * Los atributos que deben ocultarse en las serializaciones (consultas JSON/API).
+     */
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
+
+    /**
+     * Relación inversa: Un usuario pertenece a una información personal única.
+     */
     public function persona()
     {
-        return $this->belongsTo(Persona::class);
+        return $this->belongsTo(Persona::class, 'persona_id');
     }
 }

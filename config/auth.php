@@ -1,7 +1,5 @@
 <?php
 
-use App\Models\Usuario;
-
 return [
 
     /*
@@ -64,7 +62,8 @@ return [
     'providers' => [
         'users' => [
             'driver' => 'eloquent',
-            'model' => env('AUTH_MODEL', Usuario::class),
+            // 🚀 ESTE ES EL CAMBIO CLAVE: Le decimos a Laravel que use TU modelo
+            'model' => App\Models\Usuario::class,
         ],
 
         // 'users' => [
@@ -79,7 +78,7 @@ return [
     |--------------------------------------------------------------------------
     |
     | These configuration options specify the behavior of Laravel's password
-    | reset functionality, including the table utilized for token storage
+    | reset features, including the table utilized for token storage
     | and the user provider that is invoked to actually retrieve users.
     |
     | The expiry time is the number of minutes that each reset token will be
@@ -106,7 +105,7 @@ return [
     | Password Confirmation Timeout
     |--------------------------------------------------------------------------
     |
-    | Here you may define the number of seconds before a password confirmation
+    | Here you may define the amount of seconds before a password confirmation
     | window expires and users are asked to re-enter their password via the
     | confirmation screen. By default, the timeout lasts for three hours.
     |

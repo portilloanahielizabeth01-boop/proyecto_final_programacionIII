@@ -1,13 +1,11 @@
 <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
-    
-    <!-- Logo y Título -->
+
     <div class="app-brand mt-4 mb-3 ps-3">
         <a href="/" class="app-brand-link">
             <span class="app-brand-text fw-bold fs-4">
                 Servicio Técnico
             </span>
         </a>
-        <!-- Botón para cerrar menú en móviles (visible solo en pantallas chicas) -->
         <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto d-block d-xl-none">
             <i class="bx bx-chevron-left bx-sm align-middle"></i>
         </a>
@@ -16,15 +14,23 @@
     <div class="menu-inner-shadow"></div>
 
     <ul class="menu-inner py-1">
-        <!-- Dashboard -->
+        
         <li class="menu-item {{ Request::is('dashboard') ? 'active' : '' }}">
-            <a href="/" class="menu-link">
+            <a href="{{ route('dashboard') }}" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-home-circle"></i>
                 <div>Dashboard</div>
             </a>
         </li>
 
-        <!-- Clientes -->
+        @if(in_array(auth()->user()->rol, ['admin', 'empleado']))
+        <li class="menu-item {{ request()->routeIs('productos.*') ? 'active' : '' }}">
+            <a href="{{ route('productos.index') }}" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-box"></i>
+                <div>Inventario & Celulares</div>
+            </a>
+        </li>
+        @endif
+
         <li class="menu-item {{ Request::is('clientes*') ? 'active' : '' }}">
             <a href="{{ route('clientes.index') }}" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-user"></i>
@@ -32,20 +38,14 @@
             </a>
         </li>
 
-        <!-- Otros Módulos -->
-        <li class="menu-item">
+        @if(auth()->user()->rol === 'admin')
+        <li class="menu-item {{ request()->routeIs('personal.*') ? 'active' : '' }}">
             <a href="{{ route('personal.index') }}" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-hard-hat"></i>
                 <div>Empleados</div>
             </a>
         </li>
-
-        <li class="menu-item">
-            <a href="#" class="menu-link">
-                <i class="menu-icon tf-icons bx bx-mobile"></i>
-                <div>Celulares</div>
-            </a>
-        </li>
+        @endif
 
         <li class="menu-item">
             <a href="#" class="menu-link">
@@ -54,18 +54,16 @@
             </a>
         </li>
 
-        <!-- Separador de Cuenta -->
         <li class="menu-header small text-uppercase">
             <span class="menu-header-text">Cuenta</span>
         </li>
 
-        <!-- Menú de Usuario Desplegable -->
         <li class="menu-item">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons bx bx-user-circle"></i>
-                <div>{{ Auth::user()->name ?? 'Mi Cuenta' }}</div>
+                <div>{{ auth()->user()->persona->nombre ?? 'Mi Cuenta' }}</div>
             </a>
-            
+
             <ul class="menu-sub">
                 <li class="menu-item">
                     <a href="#" class="menu-link">
@@ -73,7 +71,7 @@
                         <div>Ver Perfil</div>
                     </a>
                 </li>
-                
+
                 <li class="menu-item">
                     <a href="#" class="menu-link">
                         <i class="bx bx-cog me-2"></i>
@@ -86,7 +84,7 @@
                         @csrf
                         <button type="submit" class="menu-link border-0 bg-transparent w-100 text-start" style="cursor: pointer;">
                             <i class="bx bx-power-off me-2 text-danger"></i>
-                            <div class="text-danger">Cerrar sesión</div>
+                            <span class="text-danger">Cerrar sesión</span>
                         </button>
                     </form>
                 </li>

@@ -14,10 +14,6 @@ return new class extends Migration
         Schema::create('stocks', function (Blueprint $table) {
             $table->id();
             $table->string('nombre');
-            $table->text('descripcion')->nullable();
-            $table->integer('cantidad');
-            $table->decimal('precio_comprado', 10, 2);
-            $table->decimal('precio_venta', 10, 2);
             $table->timestamps();
         });
     }

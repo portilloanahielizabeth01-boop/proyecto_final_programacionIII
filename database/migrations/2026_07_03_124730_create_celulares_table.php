@@ -16,7 +16,6 @@ return new class extends Migration
             $table->string('nombre'); // Ej: Samsung Galaxy
             $table->string('modelo'); // Ej: S23 Ultra
             $table->integer('anio')->nullable();
-            $table->string('api_device_id')->nullable()->unique(); // <-- Para enlazar con la API externa
             $table->timestamps();
         });
     }
