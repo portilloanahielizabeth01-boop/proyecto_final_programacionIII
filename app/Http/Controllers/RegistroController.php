@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Usuario;
 use App\Models\Persona;
+use App\Models\Empleado; // Agregado
+use App\Models\Contacto; // Agregado
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 
@@ -27,16 +29,14 @@ class RegistroController extends Controller
             // 📅 edad lógica (0 - 120 años)
             'fecha_nacimiento' => "required|date|before:today|after:$fechaMinima",
 
-            'sexo' => 'required|in:Masculino,Femenino,Otro',
+            // 📧 usuario como email real (Verifica que no exista en usuarios ni en contactos)
+            'usuario' => 'required|email|max:100|unique:usuarios,usuario|unique:contactos,valor',
 
-            'dni' => 'required|digits_between:6,9',
+            // 🔐 Contraseña con confirmación (Requiere un campo password_confirmation en la vista)
+            'password' => 'required|string|min:6|max:100|confirmed',
 
-            // 📧 usuario como email real
-            'usuario' => 'required|email|max:100|unique:usuarios,usuario',
-
-            'password' => 'required|string|min:6|max:100',
-
-            'codigo' => 'required|string',
+            // 🧑‍🔧 Código de empleado (Verifica que no exista en la tabla empleados)
+            'codigo' => 'required|string|unique:empleados,codigo',
         ], [
             'nombre.required' => 'El nombre es obligatorio',
             'apellido.required' => 'El apellido es obligatorio',
@@ -45,45 +45,47 @@ class RegistroController extends Controller
             'fecha_nacimiento.before' => 'La fecha no puede ser futura',
             'fecha_nacimiento.after' => 'La edad máxima permitida es 120 años',
 
-            'sexo.required' => 'Debes seleccionar un sexo',
-            'sexo.in' => 'El sexo seleccionado no es válido',
-
-            'dni.required' => 'El DNI es obligatorio',
-            'dni.digits_between' => 'El DNI debe tener entre 6 y 9 números',
-
             'usuario.required' => 'El correo es obligatorio',
             'usuario.email' => 'Debes ingresar un correo válido',
             'usuario.unique' => 'Este correo ya está registrado',
 
             'password.required' => 'La contraseña es obligatoria',
             'password.min' => 'La contraseña debe tener al menos 6 caracteres',
+            'password.confirmed' => 'Las contraseñas no coinciden', // Mensaje nuevo
 
             'codigo.required' => 'El código de técnico es obligatorio',
+            'codigo.unique' => 'Este código ya está en uso', // Mensaje nuevo
         ]);
 
-        // 🔐 código técnico fijo
-        if ($request->codigo !== "TEC-2026") {
-            return back()
-                ->withInput()
-                ->with('error', 'El código de técnico ingresado no es válido');
-        }
-
         try {
-
             DB::transaction(function () use ($request) {
 
+                // 1. Crear Persona (Sin DNI ni Sexo)
                 $persona = Persona::create([
                     'nombre' => $request->nombre,
                     'apellido' => $request->apellido,
                     'fecha_nacimiento' => $request->fecha_nacimiento,
-                    'dni' => $request->dni,
-                    'sexo' => $request->sexo,
                 ]);
 
+                // 2. Crear Empleado usando el ID de la persona
+                Empleado::create([
+                    'persona_id' => $persona->id,
+                    'codigo' => $request->codigo,
+                ]);
+
+                // 3. Crear Contacto (Correo) usando el ID de la persona
+                Contacto::create([
+                    'persona_id' => $persona->id,
+                    'tipo_contacto_id' => 1, // Asegúrate de que 1 sea el ID para "Email" en tu BD
+                    'valor' => $request->usuario,
+                ]);
+
+                // 4. Crear Usuario
                 Usuario::create([
                     'persona_id' => $persona->id,
                     'usuario' => $request->usuario, // email
                     'password' => Hash::make($request->password),
+                    'rol' => 'empleado', // Por si lo necesitas definir por defecto
                 ]);
             });
 
@@ -91,12 +93,11 @@ class RegistroController extends Controller
                 ->with('success', 'Registro exitoso. Ya puedes iniciar sesión');
 
         } catch (\Exception $e) {
-
             return back()
                 ->withInput()
-                ->with('error', 'Error al registrar el usuario. Intente nuevamente');
-
-            // 🔥 DESARROLLO (opcional):
+                ->with('error', 'Error al registrar el usuario. Intente nuevamente.');
+                
+            // 🔥 DESARROLLO (opcional para ver el error exacto si algo falla):
             // ->with('error', $e->getMessage());
         }
     }

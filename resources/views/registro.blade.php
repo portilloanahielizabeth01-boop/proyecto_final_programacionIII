@@ -9,7 +9,6 @@
             <div class="card">
                 <div class="card-body">
 
-                    <!-- Logo -->
                     <div class="app-brand justify-content-center mb-3">
                         <a href="#" class="app-brand-link gap-2">
                             <span class="app-brand-text demo text-body fw-bolder">Sneat</span>
@@ -29,7 +28,6 @@
                     <form action="{{ route('tecnico.registro.guardar') }}" method="POST">
                         @csrf
 
-                        <!-- NOMBRE -->
                         <div class="mb-3">
                             <label class="form-label">Nombre</label>
                             <input type="text"
@@ -43,7 +41,6 @@
                             @enderror
                         </div>
 
-                        <!-- APELLIDO -->
                         <div class="mb-3">
                             <label class="form-label">Apellido</label>
                             <input type="text"
@@ -57,26 +54,8 @@
                             @enderror
                         </div>
 
-                        <!-- DNI -->
                         <div class="mb-3">
-                            <label class="form-label">DNI</label>
-                            <input type="text"
-                                name="dni"
-                                value="{{ old('dni') }}"
-                                class="form-control @error('dni') is-invalid @enderror"
-                                required>
-
-                            @error('dni')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-
-
-                        <!-- FECHA NACIMIENTO -->
-                        <div class="mb-3">
-                            <label class="form-label">Fecha nacimiento</label>
-
+                            <label class="form-label">Fecha de nacimiento</label>
                             <input type="date"
                                 name="fecha_nacimiento"
                                 value="{{ old('fecha_nacimiento') }}"
@@ -88,31 +67,11 @@
                             @enderror
                         </div>
 
-                        <!-- SEXO -->
-                        <div class="mb-3">
-                            <label class="form-label">Sexo</label>
-
-                            <select name="sexo"
-                                class="form-select @error('sexo') is-invalid @enderror"
-                                required>
-
-                                <option value="">Seleccione...</option>
-                                <option value="Masculino" {{ old('sexo')=='Masculino'?'selected':'' }}>Masculino</option>
-                                <option value="Femenino" {{ old('sexo')=='Femenino'?'selected':'' }}>Femenino</option>
-                                <option value="Otro" {{ old('sexo')=='Otro'?'selected':'' }}>Otro</option>
-                            </select>
-
-                            @error('sexo')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <!-- CÓDIGO TÉCNICO -->
                         <div class="mb-3">
                             <label class="form-label">Código técnico</label>
-
                             <input type="text"
                                 name="codigo"
+                                value="{{ old('codigo') }}"
                                 class="form-control @error('codigo') is-invalid @enderror"
                                 required>
 
@@ -124,11 +83,10 @@
                         </div>
 
                         <hr>
-                        <!-- USUARIO (EMAIL) -->
-                        <div class="mb-3">
-                            <label class="form-label">usuario</label>
 
-                            <input type="text"
+                        <div class="mb-3">
+                            <label class="form-label">Correo (Usuario)</label>
+                            <input type="email"
                                 name="usuario"
                                 value="{{ old('usuario') }}"
                                 placeholder="ejemplo@mail.com"
@@ -139,16 +97,14 @@
                             <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
-                        <!-- PASSWORD -->
+
                         <div class="mb-3 form-password-toggle">
                             <label class="form-label">Contraseña</label>
-
                             <div class="input-group input-group-merge">
                                 <input type="password"
                                     name="password"
                                     class="form-control @error('password') is-invalid @enderror"
                                     required>
-
                                 <span class="input-group-text cursor-pointer">
                                     <i class="bx bx-hide"></i>
                                 </span>
@@ -161,14 +117,25 @@
                             @enderror
                         </div>
 
-                        <!-- BOTÓN SUBMIT -->
-                        <button type="submit" class="btn btn-primary d-grid w-100">
+                        <div class="mb-3 form-password-toggle">
+                            <label class="form-label">Repetir Contraseña</label>
+                            <div class="input-group input-group-merge">
+                                <input type="password"
+                                    name="password_confirmation"
+                                    class="form-control"
+                                    required>
+                                <span class="input-group-text cursor-pointer">
+                                    <i class="bx bx-hide"></i>
+                                </span>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary d-grid w-100 mt-4">
                             Crear cuenta
                         </button>
 
                     </form>
 
-                    <!-- VOLVER AL LOGIN -->
                     <a href="{{ url('/login') }}"
                         class="btn btn-outline-secondary d-grid w-100 mt-2">
                         ← Volver al inicio

@@ -2,24 +2,31 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use App\Models\Persona;
+use App\Models\Usuario;
+use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
-    use WithoutModelEvents;
-
     /**
      * Seed the application's database.
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        // 1. Creamos los datos personales del Administrador
+        $personaAdmin = Persona::create([
+            'nombre' => 'Administrador',
+            'apellido' => 'General',
+            'fecha_nacimiento' => '1999-06-18', // Pon una fecha cualquiera
+        ]);
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+        // 2. Creamos su cuenta de usuario vinculada a esa persona
+        Usuario::create([
+            'persona_id' => $personaAdmin->id,
+            'usuario' => 'admin@correo.com',          // <-- CORREO POR DEFECTO
+            'password' => Hash::make('admin003'), // <-- CONTRASEÑA POR DEFECTO
+            'rol' => 'admin',                        // <-- ROL DE ADMIN
         ]);
     }
 }
