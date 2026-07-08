@@ -10,14 +10,14 @@
                 <div class="card-body p-5">
 
                     <div class="app-brand justify-content-center mb-4">
-                        <img src="{{ asset('assets/img/icons/global/global.png') }}" 
+                        <img src="{{ asset('assets/img/icons/global/iconoresetgo-removebg-preview.png') }}" 
                              class="img-fluid" 
                              style="max-width: 120px;" 
-                             alt="Servicio Técnico">
+                             alt="Reset & Go">
                     </div>
 
                     <div class="text-center mb-4">
-                        <h3>Sistema de Servicio Técnico</h3>
+                        
                         <p class="text-muted">
                             Ingresá tus credenciales para continuar
                         </p>

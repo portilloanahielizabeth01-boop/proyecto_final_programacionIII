@@ -84,29 +84,29 @@ class RegistroController extends Controller
 
             DB::transaction(function () use ($request) {
 
-                // Crear Persona
+                // 1. Crear Persona
                 $persona = Persona::create([
                     'nombre' => $request->nombre,
                     'apellido' => $request->apellido,
                     'fecha_nacimiento' => $request->fecha_nacimiento,
                 ]);
 
-                // Crear Empleado
-                Empleado::create([
+                // 2. Crear Empleado
+                $empleado = Empleado::create([
                     'persona_id' => $persona->id,
                     'codigo' => $request->codigo,
                 ]);
 
-                // Crear Contacto
+                /* // 3. Crear Contacto
                 Contacto::create([
                     'persona_id' => $persona->id,
                     'tipo_contacto_id' => 1,
-                    'valor' => $request->usuario,
-                ]);
+                    'valor' => $request->usuario, // Asegúrate de que $request->usuario sea el email
+                ]); */
 
-                // Crear Usuario
-                Usuario::create([
-                    'persona_id' => $persona->id,
+                // 4. Crear Usuario
+                $usuario = Usuario::create([
+                    'persona_id' => $empleado->id,
                     'usuario' => $request->usuario,
                     'password' => Hash::make($request->password),
                     'rol' => 'empleado',
@@ -115,12 +115,11 @@ class RegistroController extends Controller
 
             return redirect('/login')
                 ->with('success', 'Registro exitoso. Ya puedes iniciar sesión.');
-
         } catch (\Exception $e) {
 
             return back()
-    ->withInput()
-    ->with('error', $e->getMessage());
+                ->withInput()
+                ->with('error', $e->getMessage());
 
             // Para depuración:
             // ->with('error', $e->getMessage());

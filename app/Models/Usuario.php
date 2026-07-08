@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use App\Models\Persona;
 
-class Usuario extends Authenticatable 
+class Usuario extends Authenticatable
 {
     use HasFactory;
 
@@ -31,12 +31,13 @@ class Usuario extends Authenticatable
         'password',
         'remember_token',
     ];
-
-    /**
-     * Relación inversa: Un usuario pertenece a una información personal única.
-     */
-    public function persona()
+    public function empleado()
     {
-        return $this->belongsTo(Persona::class, 'persona_id');
+        // Relación con el modelo Empleado
+        return $this->belongsTo(Empleado::class, 'empleado_id');
     }
+    public function historialClientes()
+{
+    return $this->hasMany(HistorialCliente::class);
+}
 }

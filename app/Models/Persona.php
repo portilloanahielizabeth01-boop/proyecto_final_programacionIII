@@ -22,7 +22,7 @@ class Persona extends Model
 
     public function contactos()
     {
-        return $this->hasMany(Contacto::class);
+        return $this->hasMany(Contacto::class, 'persona_id');
     }
 
     public function usuario()

@@ -3,7 +3,7 @@
     <div class="app-brand mt-4 mb-3 ps-3">
         <a href="/" class="app-brand-link">
             <span class="app-brand-text fw-bold fs-4">
-                Servicio Técnico
+                Reset & Go
             </span>
         </a>
         <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto d-block d-xl-none">
@@ -14,7 +14,7 @@
     <div class="menu-inner-shadow"></div>
 
     <ul class="menu-inner py-1">
-        
+
         <li class="menu-item {{ Request::is('dashboard') ? 'active' : '' }}">
             <a href="{{ route('dashboard') }}" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-home-circle"></i>
@@ -37,6 +37,21 @@
                 <div>Clientes</div>
             </a>
         </li>
+        @if(auth()->user()->rol === 'admin')
+        <li class="menu-item {{ Request::is('mano-obra*') ? 'active' : '' }}">
+            <a href="{{ route('mano_obra.index') }}" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-list-ul"></i>
+                <div data-i18n="Tarifario">Tarifario</div>
+            </a>
+        </li>
+        @endif
+
+        <li class="menu-item {{ Request::is('arreglos*') ? 'active' : '' }}">
+            <a href="{{ route('arreglos.index') }}" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-wrench"></i>
+                <div data-i18n="Arreglos">Reparaciones</div>
+            </a>
+        </li>
 
         @if(auth()->user()->rol === 'admin')
         <li class="menu-item {{ request()->routeIs('personal.*') ? 'active' : '' }}">
@@ -47,12 +62,7 @@
         </li>
         @endif
 
-        <li class="menu-item">
-            <a href="#" class="menu-link">
-                <i class="menu-icon tf-icons bx bx-wrench"></i>
-                <div>Reparaciones</div>
-            </a>
-        </li>
+        
 
         <li class="menu-header small text-uppercase">
             <span class="menu-header-text">Cuenta</span>
@@ -66,18 +76,13 @@
 
             <ul class="menu-sub">
                 <li class="menu-item">
-                    <a href="#" class="menu-link">
-                        <i class="bx bx-user me-2"></i>
-                        <div>Ver Perfil</div>
+                    <a href="{{ route('perfil.show') }}" class="menu-link">
+                        <i class="menu-icon tf-icons bx bx-user"></i>
+                        <div data-i18n="Ver Perfil">Ver Perfil</div>
                     </a>
                 </li>
 
-                <li class="menu-item">
-                    <a href="#" class="menu-link">
-                        <i class="bx bx-cog me-2"></i>
-                        <div>Configuración</div>
-                    </a>
-                </li>
+
 
                 <li class="menu-item">
                     <form action="{{ route('logout') }}" method="POST" class="d-inline w-100">

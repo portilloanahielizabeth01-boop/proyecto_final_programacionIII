@@ -26,13 +26,16 @@ class StockController extends Controller
 
         $todosLosCelulares = Celular::orderBy('nombre')->get();
         $stocks = Stock::orderBy('nombre', 'asc')->get();
-        $historialCambios = HistorialStock::with(['stock', 'usuario.persona'])->latest()->get();
+        $historialCambios = HistorialStock::with(['stock', 'usuario.empleado.persona'])
+            ->latest()
+            ->paginate(10);
 
         return view('productos.index', [
             'items' => $items, // Cambiamos el nombre para diferenciarlo
             'todosLosCelulares' => $todosLosCelulares,
             'stocks' => $stocks,
-            'historialCambios' => $historialCambios
+            'historialCambios' => $historialCambios,
+            'stockJson' => \DB::table('celular_stock')->get()->toJson()
         ]);
     }
 
@@ -44,12 +47,18 @@ class StockController extends Controller
             'nombre' => 'required|string|max:255|unique:stocks,nombre',
         ]);
 
-        Stock::create([
+        $componente = Stock::create([
             'nombre' => $request->nombre
         ]);
-
+        HistorialStock::create([
+            'stock_id'   => $componente->id,
+            'usuario_id' => auth()->id(),
+            'accion'     => 'Alta de Componente',
+            'detalles'   => "Se registró un nuevo componente en el catálogo: '{$request->nombre}'."
+        ]);
         return back()->with('success', 'Componente base registrado en el catálogo con éxito.');
     }
+
 
     // MÉTODO 2: Vincula un componente existente con un celular, cantidad y precios (Pestaña: Agregar Componente / Stock)
     public function vincular(Request $request)
@@ -60,32 +69,49 @@ class StockController extends Controller
             'cantidad'        => 'required|integer|min:0',
             'precio_comprado' => 'required|numeric|min:0',
             'precio_venta'    => 'required|numeric|min:0',
-            'descripcion'     => 'nullable|string'
         ]);
 
         $componente = Stock::findOrFail($request->stock_id);
+        $relacion = $componente->celularesCompatibles()->where('celular_id', $request->celular_id)->first();
 
-        // syncWithoutDetaching agrega la relación a la tabla pivote sin borrar las que ya existan
-        $componente->celularesCompatibles()->syncWithoutDetaching([
-            $request->celular_id => [
+        if ($relacion) {
+            // SI EXISTE: Actualizamos sumando
+            $nuevaCantidad = $relacion->pivot->cantidad + $request->cantidad;
+
+            $componente->celularesCompatibles()->updateExistingPivot($request->celular_id, [
+                'cantidad'        => $nuevaCantidad,
+                'precio_comprado' => $request->precio_comprado,
+                'precio_venta'    => $request->precio_venta,
+            ]);
+
+            HistorialStock::create([
+                'stock_id'   => $componente->id,
+                'usuario_id' => auth()->id(),
+                'accion'     => 'Actualización de Stock',
+                'detalles'   => "Se sumaron {$request->cantidad} unidades (Total: {$nuevaCantidad}). Precios ajustados a Compra: \${$request->precio_comprado}, Venta: \${$request->precio_venta}."
+            ]);
+
+            $mensaje = "Stock actualizado. Nueva cantidad: " . $nuevaCantidad;
+        } else {
+            // SI NO EXISTE: Primera vinculación
+            $componente->celularesCompatibles()->attach($request->celular_id, [
                 'cantidad'        => $request->cantidad,
                 'precio_comprado' => $request->precio_comprado,
                 'precio_venta'    => $request->precio_venta,
-                'descripcion'     => $request->descripcion,
-                'created_at'      => now(),
-                'updated_at'      => now(),
-            ]
-        ]);
+                'descripcion'     => $request->descripcion
+            ]);
 
-        // Registro de Auditoría
-        HistorialStock::create([
-            'stock_id'   => $componente->id,
-            'usuario_id' => auth()->id(),
-            'accion'     => 'Ingreso de Stock',
-            'detalles'   => "Se vincularon {$request->cantidad} unidades al modelo seleccionado."
-        ]);
+            HistorialStock::create([
+                'stock_id'   => $componente->id,
+                'usuario_id' => auth()->id(),
+                'accion'     => 'Creación de Stock',
+                'detalles'   => "Vinculación inicial con {$request->cantidad} unidades."
+            ]);
 
-        return back()->with('success', '¡Stock y precios vinculados al celular correctamente!');
+            $mensaje = "Componente vinculado correctamente.";
+        }
+
+        return back()->with('success', $mensaje);
     }
 
     // MÉTODO 3: Actualiza los precios desde el botón de editar en la tabla principal
@@ -95,25 +121,32 @@ class StockController extends Controller
             'celular_id'      => 'required|exists:celulares,id',
             'precio_comprado' => 'required|numeric|min:0',
             'precio_venta'    => 'required|numeric|min:0',
+            'cantidad_sumar'  => 'required|integer|min:0',
         ]);
 
         $componente = Stock::findOrFail($id);
 
-        // Actualizamos exclusivamente la fila correspondiente en la tabla pivote
+        // Obtenemos la relación actual para comparar
+        $relacionActual = $componente->celularesCompatibles()->where('celular_id', $request->celular_id)->first();
+        $cantidadAnterior = $relacionActual->pivot->cantidad;
+        $nuevaCantidad = $cantidadAnterior + $request->cantidad_sumar;
+
+        // Actualizamos la tabla pivote
         $componente->celularesCompatibles()->updateExistingPivot($request->celular_id, [
+            'cantidad'        => $nuevaCantidad,
             'precio_comprado' => $request->precio_comprado,
             'precio_venta'    => $request->precio_venta,
             'updated_at'      => now(),
         ]);
 
-        // Opcional: Registrar la edición en el historial
+        // Historial dinámico
         HistorialStock::create([
             'stock_id'   => $componente->id,
             'usuario_id' => auth()->id(),
-            'accion'     => 'Actualización de Precios',
-            'detalles'   => "Se actualizaron los precios para un modelo compatible."
+            'accion'     => 'Actualización',
+            'detalles'   => "Se sumaron {$request->cantidad_sumar} unidades (Total: {$nuevaCantidad}). Precios ajustados a Compra: \${$request->precio_comprado}, Venta: \${$request->precio_venta}."
         ]);
 
-        return back()->with('success', 'Precios actualizados correctamente para este modelo.');
+        return back()->with('success', 'Stock y precios actualizados correctamente.');
     }
 }

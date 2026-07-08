@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Módulo de Productos - Servicio Técnico')
+@section('title', 'Módulo de Productos - Reset & Go')
 
 @section('content')
 <div class="container-xxl flex-grow-1 container-p-y">
@@ -65,7 +65,7 @@
         </ul>
 
         <div class="tab-content">
-            
+
             <div class="tab-pane fade show active" id="navs-listado" role="tabpanel">
 
                 <h5 class="card-header px-0">
@@ -177,12 +177,12 @@
 
 
             </div>
-            
+
 
 
             <div class="tab-pane fade" id="navs-form-celular" role="tabpanel">
                 <h5 class="mb-4">Registrar Nuevo Modelo de Celular</h5>
-                <form action="{{ route('celulares.store') }}" method="POST">
+                <form action="{{ route('celulares.storeCelular') }}" method="POST">
                     @csrf
                     <div class="row">
                         <div class="col-md-5 mb-3">
@@ -195,7 +195,7 @@
                         </div>
                         <div class="col-md-2 mb-3">
                             <label class="form-label">Año</label>
-                            <input type="number" name="anio" class="form-control" placeholder="Ej: 2023" min="1990">
+                            <input type="number" name="anio" class="form-control" placeholder="Ej: {{ date('Y') }}" min="1990" max="{{ date('Y') }}" required>
                         </div>
                     </div>
                     <button type="submit" class="btn btn-primary">Guardar Celular en la Base de Datos</button>
@@ -308,12 +308,30 @@
                             <tr>
                                 <td><span class="text-muted small"><i class="bx bx-calendar me-1"></i>{{ $log->created_at->format('d/m/Y H:i:s') }}</span>
                                 </td>
-                                <td><strong>{{ $log->stock->nombre ?? 'Componente Eliminado' }}</strong></td>
                                 <td>
-                                    <span class="badge bg-label-secondary">
-                                        {{ $log->usuario->persona->nombre ?? 'Sistema' }} {{ $log->usuario->persona->apellido ?? '' }}
-                                    </span>
-                                    <small class="text-muted d-block" style="font-size: 0.75rem;">Rol: {{ ucfirst($log->usuario->rol ?? '') }}</small>
+                                    <strong>
+                                        @if($log->stock)
+                                        {{ $log->stock->nombre }}
+                                        @else
+                                        <span class="text-muted italic">Alta de Celular</span>
+                                        @endif
+                                    </strong>
+                                </td>
+                                <td>
+
+                                    @if($log->usuario)
+                                    @if($log->usuario->empleado && $log->usuario->empleado->persona)
+                                    {{-- Es un empleado con persona --}}
+                                    {{ $log->usuario->empleado->persona->nombre }} {{ $log->usuario->empleado->persona->apellido }}
+                                    <br>
+                                    <small class="text-muted">Empleado</small>
+                                    @else
+                                    {{-- Es un usuario sin empleado, probablemente Admin --}}
+                                    <span class="badge bg-label-danger">Admin</span>
+                                    @endif
+                                    @else
+                                    <span class="text-danger">Sistema</span>
+                                    @endif
                                 </td>
                                 <td>
                                     <span class="badge {{ $log->accion === 'Creación' ? 'bg-label-success' : 'bg-label-warning' }}">
@@ -336,6 +354,7 @@
 
         </div>
         @foreach($items as $item)
+
 
 
         <div class="modal fade"
@@ -382,7 +401,11 @@
 
 
                         <div class="modal-body">
-
+                            <div class="mb-3">
+                                <label class="form-label">Cantidad a Sumar</label>
+                                <input type="number" name="cantidad_sumar" class="form-control" value="0" min="0" required>
+                                <small class="text-muted">La cantidad ingresada se sumará al stock actual.</small>
+                            </div>
 
                             <div class="mb-3">
 
@@ -461,6 +484,25 @@
 
 
         @endforeach
+
     </div>
 </div>
+@endsection
+@section('scripts')
+<script>
+    const stocksData = {
+        !!$stockJson!!
+    };
+    document.querySelector('select[name="celular_id"]').addEventListener('change', function() {
+        const stockId = document.querySelector('select[name="stock_id"]').value;
+        const celularId = this.value;
+        const encontrada = stocksData.find(s => s.stock_id == stockId && s.celular_id == celularId);
+
+        if (encontrada) {
+            document.querySelector('input[name="precio_comprado"]').value = encontrada.precio_comprado;
+            document.querySelector('input[name="precio_venta"]').value = encontrada.precio_venta;
+
+        }
+    });
+</script>
 @endsection

@@ -4,10 +4,10 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
 
-    <title>@yield('title', 'Sistema de Servicio Técnico')</title>
+    <title>@yield('title', 'Reset & Go')</title>
 
     <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="{{ asset('assets/img/favicon/favicon.ico') }}" />
+    <link rel="icon" type="image/png" href="{{ asset('assets/img/icons/global/iconoresetgo-removebg-preview.png') }}" />
 
     <!-- Fonts y Core CSS -->
     
@@ -42,7 +42,7 @@
                                 <i class="bx bx-menu bx-sm"></i>
                             </a>
                         </div>
-                        <div class="navbar-brand-name fw-bold">Servicio Técnico</div>
+                        <div class="navbar-brand-name fw-bold">Reset & Go</div>
                     </div>
                 </nav>
 
@@ -72,5 +72,6 @@
     <script src="{{ asset('assets/vendor/js/menu.js') }}"></script>
     <script src="{{ asset('assets/js/main.js') }}"></script>
     @livewireScripts
+    @yield('scripts')
 </body>
 </html>

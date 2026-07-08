@@ -11,13 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('personas', function (Blueprint $table) {
-            $table->id();
-            $table->string('nombre');
-            $table->string('apellido');
-            $table->date('fecha_nacimiento')->nullable();
-            $table->string('dni')->unique()->nullable();
-            $table->timestamps();
+        Schema::table('arreglos', function (Blueprint $table) {
+            $table->string('estado_pago')->default('Pendiente');
+            $table->text('motivo_no_pago')->nullable();
         });
     }
 
@@ -26,6 +22,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('personas');
+        Schema::table('arreglos', function (Blueprint $table) {
+            //
+        });
     }
 };

@@ -8,7 +8,7 @@
     <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
         <div class="navbar-nav align-items-center">
             <div class="nav-item mb-0 fw-semibold">
-                Sistema de Servicio Técnico
+                Reset & Go
             </div>
         </div>
 

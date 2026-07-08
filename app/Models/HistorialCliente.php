@@ -4,26 +4,24 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class HistorialStock extends Model
+class HistorialCliente extends Model
 {
-    protected $table = 'historial_stocks';
-
+    protected $table = 'historial_clientes';
 
     protected $fillable = [
-        'stock_id',
+        'cliente_id',
         'usuario_id',
         'accion',
         'detalles'
     ];
-
 
     public function usuario()
     {
         return $this->belongsTo(Usuario::class, 'usuario_id');
     }
 
-    public function stock()
+    public function cliente()
     {
-        return $this->belongsTo(Stock::class, 'stock_id');
+        return $this->belongsTo(Cliente::class, 'cliente_id');
     }
 }
